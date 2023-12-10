@@ -13,6 +13,7 @@ namespace WebApi.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly Random _random = new Random();
 
         private static readonly Counter _myCustomCounter = Metrics
        .CreateCounter("my_custom_counter", "A custom counter");
@@ -23,14 +24,16 @@ namespace WebApi.Controllers
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        public async Task<IEnumerable<WeatherForecast>> GetAsync()
         {
+            var random = _random.Next(0, 5000);
+            await Task.Delay(_random.Next(0, 5000));
             _myCustomCounter.Inc();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
                 TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+                Summary = $"Waited random {random} ms"
             })
             .ToArray();
         }
